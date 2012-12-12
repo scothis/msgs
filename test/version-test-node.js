@@ -27,7 +27,7 @@
 	assert = buster.assert;
 	refute = buster.refute;
 
-	define('integration/version-test', function (require) {
+	define(function (require) {
 
 		var componentJson, packageJson;
 
@@ -51,9 +51,8 @@
 
 }(
 	this.buster || require('buster'),
-	typeof define === 'function' && define.amd ? define : function (id, factory) {
-		var packageName = id.split(/[\/\-]/)[0], pathToRoot = id.replace(/[^\/]+/g, '..');
-		pathToRoot = pathToRoot.length > 2 ? pathToRoot.substr(3) : pathToRoot;
+	typeof define === 'function' && define.amd ? define : function (factory) {
+		var parts = module.id.split('/test/'), pathToRoot = parts.pop().replace(/[^\/]+/g, '..'), packageName = parts.pop().split('/').pop();
 		factory(function (moduleId) {
 			return require(moduleId.indexOf(packageName) === 0 ? pathToRoot + moduleId.substr(packageName.length) : moduleId);
 		});

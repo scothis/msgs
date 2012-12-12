@@ -36,6 +36,7 @@
 		"curl": "https://github.com/cujojs/curl/tarball/0.7.2",
 		"poly": "https://github.com/cujojs/poly/tarball/0.5.1",
 		"buster": "",
+		"buster-amd": "",
 		"jshint": ""
 	},
 	"main": "./integration",

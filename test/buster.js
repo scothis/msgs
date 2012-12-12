@@ -38,10 +38,19 @@ config['integration:node'] = {
 
 config['integration:browser'] = {
 	environment: 'browser',
-	autoRun: false,
 	rootPath: '../',
 	resources: [
-		'**'
+		'*.js',
+		'adapters/*.js',
+		'aggregators/*.js',
+		'channels/*.js',
+		'channels/dispatchers/*.js',
+		'channels/*.js',
+		'node_modules/curl/src/*.js',
+		'node_modules/when/*.js',
+		'node_modules/poly/*.js',
+		'node_modules/poly/lib/*.js',
+		'node_modules/poly/support/*.js'
 	],
 	libs: [
 		'test/curl-config.js',
@@ -52,10 +61,12 @@ config['integration:browser'] = {
 	],
 	tests: [
 		//'test/**/*-test-browser.js',
-		'test/**/*-test.js',
-		'test/run.js'
+		'test/**/*-test.js'
 	],
 	testHelpers: [
 		'test/buster-assertions.js'
+	],
+	extensions: [
+		require('buster-amd')
 	]
 };
