@@ -181,7 +181,7 @@
 			 * @returns the found channel, undefined when not found
 			 */
 			this.resolveChannel = function resolveChannel(name) {
-				var topic, channel, send, subscribe, unsubscribe;
+				var topic, channel;
 
 				if (this.isChannel(name)) {
 					return name;
@@ -206,25 +206,7 @@
 				}
 
 				if (topic) {
-					channel = beget(channel);
-					send = channel.send;
-					subscribe = channel.subscribe;
-					unsubscribe = channel.unsubscribe;
-					if (send) {
-						channel.send = function (message) {
-							return send.call(this, message.mixin({ topic: topic }));
-						};
-						channel.subscribe = function () {
-							var args = Array.prototype.slice.call(arguments);
-							args.unshift(topic);
-							return subscribe.apply(this, args);
-						};
-						channel.unsubscribe = function () {
-							var args = Array.prototype.slice.call(arguments);
-							args.unshift(topic);
-							return unsubscribe.apply(this, args);
-						};
-					}
+					channel = topicizeChannel(topic, channel);
 				}
 
 				return channel;
@@ -923,6 +905,49 @@
 			}
 			return func.apply(this, args);
 		};
+	}
+
+	/**
+	 * Transform a channel to be appropriate for topical subscriptions. Wraps the
+	 * channels 'send', 'subscribe' and 'unsubscribe' agumenting the method args
+	 * with the topic info.
+	 *
+	 * The original channel is uneffected
+	 *
+	 * @param {string} topic the topic
+	 * @param {Channel} the cahnnel to topicize
+	 * @returns {Channel} the channel topicized
+	 */
+	function topicizeChannel(topic, channel) {
+		var send, subscribe, unsubscribe;
+
+		send = channel.send;
+		subscribe = channel.subscribe;
+		unsubscribe = channel.unsubscribe;
+
+		channel = beget(channel);
+
+		if (send) {
+			channel.send = function (message) {
+				return send.call(this, message.mixin({ topic: topic }));
+			};
+		}
+		if (subscribe) {
+			channel.subscribe = function () {
+				var args = Array.prototype.slice.call(arguments);
+				args.unshift(topic);
+				return subscribe.apply(this, args);
+			};
+		}
+		if (unsubscribe) {
+			channel.unsubscribe = function () {
+				var args = Array.prototype.slice.call(arguments);
+				args.unshift(topic);
+				return unsubscribe.apply(this, args);
+			};
+		}
+
+		return channel;
 	}
 
 }(
