@@ -180,20 +180,52 @@
 			 * @returns the found channel, undefined when not found
 			 */
 			this.resolveChannel = function resolveChannel(name) {
-				var channel;
+				var topic, channel, send, subscribe, unsubscribe;
+
 				if (this.isChannel(name)) {
 					return name;
 				}
+
+				if (typeof name === 'string') {
+					name = split(name, '!');
+					topic = name[1];
+					name = name[0];
+				}
+
 				if (name in components) {
 					channel = components[name];
 					if (isRef(channel)) {
 						channel = channel.resolve();
 					}
-					return this.resolveChannel(channel);
+					channel = this.resolveChannel(channel);
 				}
-				if (parent) {
-					return parent.resolveChannel(name);
+				else if (parent) {
+					channel = parent.resolveChannel(name);
 				}
+
+				if (topic) {
+					channel = beget(channel);
+					send = channel.send;
+					subscribe = channel.subscribe;
+					unsubscribe = channel.unsubscribe;
+					if (send) {
+						channel.send = function (message) {
+							return send.call(this, message.mixin({ topic: topic }));
+						};
+						channel.subscribe = function () {
+							var args = Array.prototype.slice.call(arguments);
+							args.push(topic);
+							return subscribe.apply(this, args);
+						};
+						channel.unsubscribe = function () {
+							var args = Array.prototype.slice.call(arguments);
+							args.push(topic);
+							return unsubscribe.apply(this, args);
+						};
+					}
+				}
+
+				return channel;
 			};
 
 			/**
@@ -830,6 +862,26 @@
 
 	});
 
+	function B() {}
+
+	/**
+	 * Shift an object's properties into the returned objects prototype.
+	 *
+	 * Enabled setting of propeties on a local object without side effects on the
+	 * target object.
+	 *
+	 * @param {Object} obj target object
+	 * @returns {Object} begotten object
+	 */
+	function beget(obj) {
+		var begotten;
+		B.prototype = obj;
+		begotten = new B();
+		B.prototype = undef;
+		return begotten;
+	}
+
+
 	/**
 	 * Incrementing counter
 	 */
@@ -869,6 +921,24 @@
 			}
 			return func.apply(this, args);
 		};
+	}
+
+	/**
+	 * Splits a string on the first occurance of the delimiter. Unlike
+	 * String.prototype.split, at most two token will be returned, the second
+	 * token may contain the delimiter.
+	 *
+	 * @param {String} str the string to split
+	 * @param {String} delimiter the string to split on
+	 * @returns {Array} the string parts
+	 */
+	function split(str, delimiter) {
+		var index;
+		index = str.indexOf(delimiter);
+		if (index < 0) {
+			return [str];
+		}
+		return [str.substr(0, index), str.substr(index + delimiter.length)];
 	}
 
 }(

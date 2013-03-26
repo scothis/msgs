@@ -657,6 +657,18 @@
 			},
 			'should have default channel type': function () {
 				assert.same('default', bus.channel().type);
+			},
+			'should resolve channels with topics': function () {
+				var spy = this.spy(function (message, headers) {
+					assert.same('hello', message);
+					assert.same('greeting', headers.topic);
+				});
+
+				bus.channel('world');
+				bus.transform(spy, { input: 'world' });
+
+				bus.send('world!greeting', 'hello');
+				assert.same(1, spy.callCount);
 			}
 		});
 
