@@ -27,7 +27,7 @@
 	 */
 	define(function (require) {
 
-		var broadcastDispatcher, directDispatcher, unicastDispatcher, when, busCounter;
+		var broadcastDispatcher, directDispatcher, unicastDispatcher, when, busCounter, channelTopicParserRE;
 
 		broadcastDispatcher = require('./channels/dispatchers/broadcast');
 		directDispatcher = require('./channels/dispatchers/direct');
@@ -35,6 +35,7 @@
 		when = require('when');
 
 		busCounter = counter();
+		channelTopicParserRE = /^([^!]*)(?:!([\w\W]*))?$/;
 
 		/**
 		 * Create a new message
@@ -186,10 +187,11 @@
 					return name;
 				}
 
-				if (typeof name === 'string') {
-					name = split(name, '!');
-					topic = name[1];
-					name = name[0];
+				if (name.match) {
+					(function (results) {
+						name = results[1];
+						topic = results[2];
+					}(name.match(channelTopicParserRE)));
 				}
 
 				if (name in components) {
@@ -214,12 +216,12 @@
 						};
 						channel.subscribe = function () {
 							var args = Array.prototype.slice.call(arguments);
-							args.push(topic);
+							args.unshift(topic);
 							return subscribe.apply(this, args);
 						};
 						channel.unsubscribe = function () {
 							var args = Array.prototype.slice.call(arguments);
-							args.push(topic);
+							args.unshift(topic);
 							return unsubscribe.apply(this, args);
 						};
 					}
@@ -921,24 +923,6 @@
 			}
 			return func.apply(this, args);
 		};
-	}
-
-	/**
-	 * Splits a string on the first occurance of the delimiter. Unlike
-	 * String.prototype.split, at most two token will be returned, the second
-	 * token may contain the delimiter.
-	 *
-	 * @param {String} str the string to split
-	 * @param {String} delimiter the string to split on
-	 * @returns {Array} the string parts
-	 */
-	function split(str, delimiter) {
-		var index;
-		index = str.indexOf(delimiter);
-		if (index < 0) {
-			return [str];
-		}
-		return [str.substr(0, index), str.substr(index + delimiter.length)];
 	}
 
 }(
