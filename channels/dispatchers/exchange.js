@@ -126,20 +126,25 @@
 				return subscription === topic;
 			},
 			topical: (function () {
-				var wordSeparatorRE = /\./g,
+				var cache = {},
+				    wordSeparatorRE = /\./g,
 				    singleWordRE = /\*/g,
 				    multiMultiWordsRE = /#\\\.#/g,
 				    multiWordLeadingRE = /#\\\./g,
 				    multiWordTrailingRE = /\\\.#/g;
-				// TODO memoize
 				return function (subscription, topic) {
 					var pattern, re;
-					pattern = subscription.replace(wordSeparatorRE, '\\.')
-					                      .replace(singleWordRE, '[^.]+')
-					                      .replace(multiMultiWordsRE, '#')
-					                      .replace(multiWordLeadingRE, '(?:.+\\.)?')
-					                      .replace(multiWordTrailingRE, '(?:\\..+)?');
-					re = new RegExp('^' + pattern + '$');
+					if (cache.hasOwnProperty(subscription)) {
+						re = cache[subscription];
+					}
+					else {
+						pattern = subscription.replace(wordSeparatorRE, '\\.')
+						                      .replace(singleWordRE, '[^.]+')
+						                      .replace(multiMultiWordsRE, '#')
+						                      .replace(multiWordLeadingRE, '(?:.+\\.)?')
+						                      .replace(multiWordTrailingRE, '(?:\\..+)?');
+						re = cache[subscription] = new RegExp('^' + pattern + '$');
+					}
 					return re.test(topic);
 				};
 			}())
