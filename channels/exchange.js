@@ -13,14 +13,14 @@
 	 */
 	define(function (require) {
 
-		var msgs, topicalDispatcher, broadcastDispatcher;
+		var msgs, exchangeDispatcher, broadcastDispatcher;
 
 		msgs = require('..');
-		topicalDispatcher = require('./dispatchers/topical');
+		exchangeDispatcher = require('./dispatchers/exchange');
 		broadcastDispatcher = require('./dispatchers/broadcast');
 
 		/**
-		 * Create a topic exchange channel
+		 * Create an exchange channel
 		 *
 		 * @param {string} [name] the name to register this channel under
 		 * @param {Matcher} [opts.matcher=literal] matcher to decide if a message
@@ -30,9 +30,18 @@
 		 */
 		msgs.prototype.exchangeChannel = msgs.utils.optionalName(function exchangeChannel(name, opts) {
 			opts = opts || {};
-			opts.matcher = opts.matcher || topicalDispatcher.matchers.literal;
+			opts.matcher = opts.matcher || exchangeDispatcher.matchers.literal;
 			opts.dispatcher = opts.dispatcher || broadcastDispatcher;
-			return this._channel(name, topicalDispatcher(opts.matcher, opts.dispatcher), 'exchange');
+			return this._channel(name, exchangeDispatcher(opts.matcher, opts.dispatcher), 'exchange');
+		});
+
+		/**
+		 * Create a topic exchange channel
+		 *
+		 * @param {string} [name] the name to register this channel under
+		 */
+		msgs.prototype.topicExchangeChannel = msgs.utils.optionalName(function topicExchangeChannel(name) {
+			return this._channel(name, exchangeDispatcher(exchangeDispatcher.matchers.topical, broadcastDispatcher), 'topic-exchange');
 		});
 
 		return msgs;

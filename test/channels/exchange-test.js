@@ -16,10 +16,10 @@
 
 	define('msgs/channels/exchange-test', function (require) {
 
-		var msgs, topicalDispatcher, unicastDispatcher, bus;
+		var msgs, exchangeDispatcher, unicastDispatcher, bus;
 
 		msgs = require('msgs/channels/exchange');
-		topicalDispatcher = require('msgs/channels/dispatchers/topical');
+		exchangeDispatcher = require('msgs/channels/dispatchers/exchange');
 		unicastDispatcher = require('msgs/channels/dispatchers/unicast');
 
 		buster.testCase('msgs/channels/exchange', {
@@ -150,52 +150,52 @@
 			},
 			'the literal matcher': {
 				'should only match the exact string': function () {
-					assert(topicalDispatcher.matchers.literal('foo', 'foo'));
-					refute(topicalDispatcher.matchers.literal('foo', 'bar'));
+					assert(exchangeDispatcher.matchers.literal('foo', 'foo'));
+					refute(exchangeDispatcher.matchers.literal('foo', 'bar'));
 				}
 			},
 			'the topical matcher': {
 				'should match the exact string': function () {
-					assert(topicalDispatcher.matchers.topical('foo', 'foo'));
-					refute(topicalDispatcher.matchers.topical('foo', 'bar'));
+					assert(exchangeDispatcher.matchers.topical('foo', 'foo'));
+					refute(exchangeDispatcher.matchers.topical('foo', 'bar'));
 				},
 				'should match with single word wildcards': function () {
-					assert(topicalDispatcher.matchers.topical('foo.*', 'foo.bar'));
-					refute(topicalDispatcher.matchers.topical('foo.*', 'bar.foo'));
+					assert(exchangeDispatcher.matchers.topical('foo.*', 'foo.bar'));
+					refute(exchangeDispatcher.matchers.topical('foo.*', 'bar.foo'));
 
-					assert(topicalDispatcher.matchers.topical('*.bar', 'foo.bar'));
-					refute(topicalDispatcher.matchers.topical('*.bar', 'bar.foo'));
+					assert(exchangeDispatcher.matchers.topical('*.bar', 'foo.bar'));
+					refute(exchangeDispatcher.matchers.topical('*.bar', 'bar.foo'));
 
-					assert(topicalDispatcher.matchers.topical('foo.*.baz', 'foo.bar.baz'));
-					refute(topicalDispatcher.matchers.topical('foo.*.baz', 'foo.bar.bar.baz'));
+					assert(exchangeDispatcher.matchers.topical('foo.*.baz', 'foo.bar.baz'));
+					refute(exchangeDispatcher.matchers.topical('foo.*.baz', 'foo.bar.bar.baz'));
 
-					assert(topicalDispatcher.matchers.topical('foo.*.*.baz', 'foo.bar.bar.baz'));
-					refute(topicalDispatcher.matchers.topical('foo.*.*.baz', 'foo.bar.baz'));
+					assert(exchangeDispatcher.matchers.topical('foo.*.*.baz', 'foo.bar.bar.baz'));
+					refute(exchangeDispatcher.matchers.topical('foo.*.*.baz', 'foo.bar.baz'));
 				},
 				'should match with single words with multi word wildcards': function () {
-					assert(topicalDispatcher.matchers.topical('foo.#', 'foo.bar'));
-					refute(topicalDispatcher.matchers.topical('foo.#', 'bar.foo'));
+					assert(exchangeDispatcher.matchers.topical('foo.#', 'foo.bar'));
+					refute(exchangeDispatcher.matchers.topical('foo.#', 'bar.foo'));
 
-					assert(topicalDispatcher.matchers.topical('#.bar', 'foo.bar'));
-					refute(topicalDispatcher.matchers.topical('#.bar', 'bar.foo'));
+					assert(exchangeDispatcher.matchers.topical('#.bar', 'foo.bar'));
+					refute(exchangeDispatcher.matchers.topical('#.bar', 'bar.foo'));
 				},
 				'should match with multiple words with multi word wildcards': function () {
-					assert(topicalDispatcher.matchers.topical('foo.#.baz', 'foo.bar.bar.baz'));
-					refute(topicalDispatcher.matchers.topical('foo.#.baz', 'foo.bar.baz.bar'));
+					assert(exchangeDispatcher.matchers.topical('foo.#.baz', 'foo.bar.bar.baz'));
+					refute(exchangeDispatcher.matchers.topical('foo.#.baz', 'foo.bar.baz.bar'));
 				},
 				'should find flexable matches': function () {
-					assert(topicalDispatcher.matchers.topical('#.foo.bar.#', 'foo.foo.foo.foo.bar.foo'));
-					assert(topicalDispatcher.matchers.topical('#.foo.bar.#', 'foo.foo.foo.bar.foo.foo'));
-					assert(topicalDispatcher.matchers.topical('#.foo.bar.#', 'foo.foo.bar.foo.foo.foo'));
+					assert(exchangeDispatcher.matchers.topical('#.foo.bar.#', 'foo.foo.foo.foo.bar.foo'));
+					assert(exchangeDispatcher.matchers.topical('#.foo.bar.#', 'foo.foo.foo.bar.foo.foo'));
+					assert(exchangeDispatcher.matchers.topical('#.foo.bar.#', 'foo.foo.bar.foo.foo.foo'));
 				},
 				'should match with optional multi word wildcards': function () {
-					assert(topicalDispatcher.matchers.topical('#.foo', 'foo'));
-					assert(topicalDispatcher.matchers.topical('foo.#', 'foo'));
-					assert(topicalDispatcher.matchers.topical('#.foo.#', 'foo'));
-					assert(topicalDispatcher.matchers.topical('foo.#.bar', 'foo.bar'));
-					assert(topicalDispatcher.matchers.topical('foo.#.#.bar', 'foo.bar'));
-					assert(topicalDispatcher.matchers.topical('foo.#.*.#.bar', 'foo.baz.bar'));
-					refute(topicalDispatcher.matchers.topical('foo.#.bar', 'foo..bar'));
+					assert(exchangeDispatcher.matchers.topical('#.foo', 'foo'));
+					assert(exchangeDispatcher.matchers.topical('foo.#', 'foo'));
+					assert(exchangeDispatcher.matchers.topical('#.foo.#', 'foo'));
+					assert(exchangeDispatcher.matchers.topical('foo.#.bar', 'foo.bar'));
+					assert(exchangeDispatcher.matchers.topical('foo.#.#.bar', 'foo.bar'));
+					assert(exchangeDispatcher.matchers.topical('foo.#.*.#.bar', 'foo.baz.bar'));
+					refute(exchangeDispatcher.matchers.topical('foo.#.bar', 'foo..bar'));
 				}
 			}
 		});

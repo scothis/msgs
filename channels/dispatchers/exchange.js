@@ -11,7 +11,7 @@
 	var undef;
 
 	/**
-	 * Topic dispatcher. Subscribers matching the message topic recieve the
+	 * Exchange dispatcher. Subscribers matching the message topic recieve the
 	 * message according to the topic disapatching strategy.
 	 *
 	 * @author Scott Andrews
@@ -24,7 +24,7 @@
 		 * @param {Function} topicDispatcher function to create a dispatcher for a
 		 *   subscribed topic
 		 */
-		function topicalDispatcher(topicMatcher, topicDispatcher) {
+		function exchangeDispatcher(topicMatcher, topicDispatcher) {
 			var dispatcher, topics;
 
 			dispatcher = {};
@@ -121,7 +121,7 @@
 			return dispatcher;
 		}
 
-		topicalDispatcher.matchers = {
+		exchangeDispatcher.matchers = {
 			literal: function literalMatcher(subscription, topic) {
 				return subscription === topic;
 			},
@@ -145,7 +145,7 @@
 			}())
 		};
 
-		return topicalDispatcher;
+		return exchangeDispatcher;
 
 	});
 
