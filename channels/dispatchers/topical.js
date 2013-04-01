@@ -124,7 +124,25 @@
 		topicalDispatcher.matchers = {
 			literal: function literalMatcher(subscription, topic) {
 				return subscription === topic;
-			}
+			},
+			topical: (function () {
+				var wordSeparatorRE = /\./g,
+				    singleWordRE = /\*/g,
+				    multiMultiWordsRE = /#\\\.#/g,
+				    multiWordLeadingRE = /#\\\./g,
+				    multiWordTrailingRE = /\\\.#/g;
+				// TODO memoize
+				return function (subscription, topic) {
+					var pattern, re;
+					pattern = subscription.replace(wordSeparatorRE, '\\.')
+					                      .replace(singleWordRE, '[^.]+')
+					                      .replace(multiMultiWordsRE, '#')
+					                      .replace(multiWordLeadingRE, '(?:.+\\.)?')
+					                      .replace(multiWordTrailingRE, '(?:\\..+)?');
+					re = new RegExp('^' + pattern + '$');
+					return re.test(topic);
+				};
+			}())
 		};
 
 		return topicalDispatcher;
