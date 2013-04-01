@@ -89,7 +89,7 @@
 				errors = [];
 				topic = message.headers.topic;
 				dispatchers = Object.keys(topics).filter(function (t) {
-					return topicMatcher(topic, t);
+					return topicMatcher(t, topic);
 				});
 
 				if (dispatchers.length === 0) {
