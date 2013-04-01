@@ -134,7 +134,7 @@
 				    multiWordTrailingRE = /\\\.#/g;
 				return function (subscription, topic) {
 					var pattern, re;
-					if (cache.hasOwnProperty(subscription)) {
+					if (cache[subscription] instanceof RegExp) {
 						re = cache[subscription];
 					}
 					else {
